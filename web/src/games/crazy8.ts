@@ -103,7 +103,7 @@ function render(table: Table<Crazy8State>): void {
       table.finish(finale(
         youWon ? "You win the round" : `${w.name} wins`,
         `${youWon ? "You went out first." : `${w.name} went out first.`} The round is worth ${st.roundPoints}. ${st.players.map((p) => `${p.name} ${p.score}`).join(" · ")}.`,
-        "New round",
+        "New game",
         () => table.restart(),
       ));
     }

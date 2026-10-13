@@ -293,9 +293,14 @@ select.seg, .seg {
 .turn-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--brass); display: inline-block; margin-right: 6px; }
 
 /* ---------- klondike ---------- */
-/* One fluid size drives every pile, slot and card inside — the card system
-   scales itself, so nothing here re-declares geometry. */
-.kl-table { --cw: clamp(38px, 11vw, 118px); }
+/* A custom property is resolved where it is declared. --ch on the root is
+   already the root card's height, so a local --cw alone squashes the card.
+   Meld and plaza cards set the pair together; this table does the same. */
+.kl-table {
+  --cw: clamp(38px, 11vw, 118px);
+  --ch: calc(var(--cw) * 1.42);
+  --r-card: calc(var(--cw) * 0.11);
+}
 .kl-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
 .kl-col { display: flex; flex-direction: column; align-items: center; min-height: calc(var(--ch) + 8px); }
 /* A fixed peek, so the rank stays readable on a phone and on a wide table. */

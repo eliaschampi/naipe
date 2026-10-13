@@ -15,7 +15,7 @@ The boundary is raw WebAssembly: pipe-delimited commands in, a JSON state docume
 ```sh
 # 1. Build the engine
 cd engine
-cargo test                                        # 64 rule tests
+cargo test                                        # 65 rule tests
 cargo build --target wasm32-unknown-unknown --release
 
 # 2. Serve the app

@@ -402,6 +402,35 @@ fn runs_meld_and_win_by_going_out() {
 }
 
 #[test]
+fn runs_stalemate_keeps_the_hand_and_scores_nothing() {
+    let mut g = Runs::new(3, 3);
+    g.hands[0] = cs(&["KS"]);
+    g.hands[1] = cs(&["AS"]);
+    g.hands[2] = cs(&["5C"]);
+    g.draw.clear();
+    g.discard = cs(&["2D"]);
+    g.melds.clear();
+    g.turn = 0;
+    g.phase = RPhase::Draw;
+    g.draw_stock().unwrap();
+    assert_eq!(g.phase, RPhase::Over);
+    assert_eq!(g.winner, Some(1), "Nora holds the only ace");
+    assert_eq!(g.scores, vec![0, 0, 0]);
+    assert_eq!(g.hands[1], cs(&["AS"]));
+    let json = g.to_json();
+    assert!(json.contains("\"winner\":1"), "{json}");
+    assert!(
+        json.contains("\"name\":\"Nora\",\"count\":1,\"human\":false,\"score\":0,\"deadwood\":1"),
+        "{json}"
+    );
+    assert!(
+        g.log.iter().any(|l| l == "Cards run out — Nora holds the lightest hand"),
+        "{:?}",
+        g.log
+    );
+}
+
+#[test]
 fn runs_going_out_by_melting_every_card() {
     let mut g = Runs::new(14, 3);
     g.hands[0] = cs(&["7C", "7D", "7H"]);

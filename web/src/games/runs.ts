@@ -122,11 +122,17 @@ export function mount(root: HTMLElement, shell: Shell): () => void {
           view.append(sec);
         }
 
-        const turnText = st.phase === "over"
-          ? st.winner === st.you ? "You went out." : `${st.players[st.winner ?? 0].name} went out.`
-          : !mine ? `${st.players[st.turn].name} is playing…`
-          : st.phase === "draw" ? "Draw one card — from the stock, or take the discard."
-          : "Build if you want, then discard one card.";
+        const over = st.phase === "over";
+        const winner = st.players[st.winner ?? 0];
+        const youWon = st.winner === st.you;
+        const wentOut = over && winner.count === 0;
+        const turnText = !over
+          ? !mine ? `${st.players[st.turn].name} is playing…`
+            : st.phase === "draw" ? "Draw one card — from the stock, or take the discard."
+            : "Build if you want, then discard one card."
+          : wentOut
+            ? youWon ? "You went out." : `${winner.name} went out.`
+            : youWon ? "You hold the lightest hand." : `${winner.name} holds the lightest hand.`;
         view.append(statusLine(turnText, building || (mine && st.phase === "draw")), el("div", "hint", verdict), errorLine());
 
         const handEl = el("div", "hand fan");
@@ -190,13 +196,17 @@ export function mount(root: HTMLElement, shell: Shell): () => void {
         view.append(el("div", "hint", `Deadwood — ${st.players.map((p) => `${p.name} ${p.deadwood ?? 0}`).join(" · ")}`));
         view.append(logEl(st.log));
 
-        if (st.phase === "over") {
-          const w = st.players[st.winner ?? 0];
-          const youWon = st.winner === st.you;
+        if (over) {
+          const tally = st.players.map((p) => `${p.name} ${p.score}`).join(" · ");
+          const deadwood = st.players.map((p) => `${p.name} ${p.deadwood ?? 0}`).join(" · ");
           table.finish(finale(
-            youWon ? "You go out" : `${w.name} goes out`,
-            youWon ? "You emptied your hand first." : `${w.name} emptied first.`,
-            "New round",
+            wentOut
+              ? youWon ? "You go out" : `${winner.name} goes out`
+              : "Stock runs out",
+            wentOut
+              ? `${youWon ? "You emptied your hand first and take" : `${winner.name} emptied first and takes`} ${winner.score} points. ${tally}.`
+              : `${youWon ? "You hold" : `${winner.name} holds`} the lightest hand. Nobody scores. Deadwood — ${deadwood}.`,
+            "New game",
             () => table.restart(),
           ));
         }
