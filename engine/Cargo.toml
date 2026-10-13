@@ -1,0 +1,17 @@
+[package]
+name = "naipe-engine"
+version = "1.0.0"
+edition = "2021"
+description = "Canonical rules engine for the Naipe card game collection."
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
